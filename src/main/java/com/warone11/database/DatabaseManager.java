@@ -1,7 +1,6 @@
 package com.warone11.database;
 
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,16 +15,18 @@ public class DatabaseManager {
 
 
     public static Connection getConnection(){
-
+        if(con != null){
+            return con;
+        }
         String url = "jdbc:sqlite:data/127mc.db";
         boolean dataBaseExists =Files.exists(Path.of("data/127mc.db"));
         try{
-             Connection con= DriverManager.getConnection(url, USERNAME, PASSWORD);
+             con= DriverManager.getConnection(url, USERNAME, PASSWORD);
              try (Statement statement = con.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON;");
              } 
              if(!dataBaseExists){
-                Initialize(con);
+                Initialize();
              }
              return con;
         } catch (SQLException e){
@@ -34,7 +35,7 @@ public class DatabaseManager {
         }
         
     }
-    private static void Initialize(Connection con){
+    private static void Initialize(){
         
     }
 }
