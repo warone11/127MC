@@ -10,9 +10,10 @@ create table if not exists "access_token"(
     hash char(64) not null,
     user_uuid char(36) not null,
     created_at DATETIME not null DEFAULT CURRENT_TIMESTAMP,
-    foreign key (user_uuid) references user(uuid),
     expires_at DATETIME,
-    active int not null check (active in(0,1)) default 1
+    active int not null check (active in(0,1)) default 1,
+    foreign key (user_uuid) references user(uuid)
+    
 );
 create table if not exists "server"(
     uuid char(36) primary key not null,
@@ -53,7 +54,7 @@ create table if not exists "session_token"(
     user_uuid char(36) not null,
     foreign key (user_uuid) references user(uuid)
 );
-create table if not exists "action"(
+create table if not exists "server_action"(
     uuid char(36) primary key not null,
     name varchar(255) not null,
     action_time DATETIME not null DEFAULT CURRENT_TIMESTAMP,

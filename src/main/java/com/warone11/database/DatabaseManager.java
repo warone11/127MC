@@ -18,16 +18,19 @@ public class DatabaseManager {
         if(con != null){
             return con;
         }
+        try {
+            Files.createDirectories(Path.of("data"));
+        } catch (Exception e) {
+            
+        }
+        
         String url = "jdbc:sqlite:data/127mc.db";
-        boolean dataBaseExists =Files.exists(Path.of("data/127mc.db"));
         try{
-             con= DriverManager.getConnection(url, USERNAME, PASSWORD);
-             try (Statement statement = con.createStatement()) {
+            con= DriverManager.getConnection(url, USERNAME, PASSWORD);
+            try (Statement statement = con.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON;");
-             } 
-             if(!dataBaseExists){
-                Initialize();
-             }
+            }
+            Initialize();
              return con;
         } catch (SQLException e){
             e.printStackTrace();
@@ -36,6 +39,26 @@ public class DatabaseManager {
         
     }
     private static void Initialize(){
-        
+        String baseDatabase=null;
+        try {
+            baseDatabase = Files.readString(Path.of("src/main/resources/database/baseSchema.sql"));
+            
+
+        } catch (Exception e) {
+            System.out.println("Path to sql not found");
+        } 
+        if(baseDatabase!=null){
+            String[] stmts = baseDatabase.split(";");
+            try(Statement stmt = con.createStatement()){
+                for (String string : stmts) {
+                    stmt.addBatch(string);
+                }
+                stmt.executeBatch();
+                System.out.println("Database initialized sucessfully");
+                
+            }catch (SQLException e) {
+                System.err.println("Error in database initialization "+e);
+            }
+        }
     }
 }
