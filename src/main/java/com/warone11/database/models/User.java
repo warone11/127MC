@@ -1,7 +1,11 @@
 package com.warone11.database.models;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.warone11.database.DatabaseManager;
 /**
  * Defines a user of the application
  * User
@@ -10,7 +14,7 @@ public class User {
     private UUID uuid;
     private String username;
     private String passwordHash;
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
     /**
      * Creates a new user
      * @param uuid uuid of the user
@@ -19,7 +23,7 @@ public class User {
      * @param created_at timestamp when the user was created
      * @throws IllegalArgumentException if uuid or username are null
      */
-    public User(UUID uuid, String username, String passwordHash, LocalDateTime created_at) {
+    public User(UUID uuid, String username, String passwordHash, LocalDateTime createdAt) {
         if(uuid==null)
             throw new IllegalArgumentException("field uuid cannot be null");
         if(username==null)
@@ -27,7 +31,10 @@ public class User {
         this.uuid = uuid;
         this.username = username;
         this.passwordHash = passwordHash;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
+    }
+    public User(ResultSet rs) throws SQLException{
+        this(UUID.fromString(rs.getString("uuid")),rs.getString("username"),rs.getString("pasword_hash"),rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"), DatabaseManager.SQLITE_DATETIME_FORMAT));
     }
 
     public UUID getUuid() {
@@ -52,8 +59,16 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public LocalDateTime getCreated_at() {
-        return this.created_at;
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+    public String getCreatedAtAsSQL(){
+        if(createdAt==null){
+            return null;
+        }
+        else{
+            return createdAt.format(DatabaseManager.SQLITE_DATETIME_FORMAT);
+        }
     }
 
     @Override
@@ -62,7 +77,7 @@ public class User {
             " uuid='" + getUuid() + "'" +
             ", username='" + getUsername() + "'" +
             ", passwordHash='" + getPasswordHash() + "'" +
-            ", created_at='" + getCreated_at() + "'" +
+            ", created_at='" + getCreatedAt() + "'" +
             "}";
     }
 

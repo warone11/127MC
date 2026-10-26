@@ -6,13 +6,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 /** Manages the connection to the database
  */
 public class DatabaseManager {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
     private static Connection con;
-
+    public static final DateTimeFormatter SQLITE_DATETIME_FORMAT =DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static Connection getConnection(){
         if(con != null){
