@@ -34,7 +34,7 @@ public class User {
         this.createdAt = createdAt;
     }
     public User(ResultSet rs) throws SQLException{
-        this(UUID.fromString(rs.getString("uuid")),rs.getString("username"),rs.getString("pasword_hash"),rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"), DatabaseManager.SQLITE_DATETIME_FORMAT));
+        this(UUID.fromString(rs.getString("uuid")),rs.getString("username"),rs.getString("password_hash"),rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"), DatabaseManager.SQLITE_DATETIME_FORMAT));
     }
 
     public UUID getUuid() {
@@ -73,12 +73,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "{" +
-            " uuid='" + getUuid() + "'" +
-            ", username='" + getUsername() + "'" +
-            ", passwordHash='" + getPasswordHash() + "'" +
-            ", created_at='" + getCreatedAt() + "'" +
-            "}";
+        return "----------------------\n"+
+        "uuid: "+uuid+"\n" +
+        "username: " + username + "\n" +
+        "passwordHash: " + passwordHash + "\n" +
+        "createdAt: " + createdAt + "\n";
     }
-
 }
