@@ -5,10 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,7 +85,8 @@ public class UserRepository {
         }
         return users;
     }
-     public List<User> findAll(SQLModifier modifier){
+    public List<User> findAll(SQLModifier modifier){
         return findAll(modifier.toQuery());
-     }
+    }
+    
 }

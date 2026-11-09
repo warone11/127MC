@@ -79,4 +79,11 @@ public class User {
         "passwordHash: " + passwordHash + "\n" +
         "createdAt: " + createdAt + "\n";
     }
+    @Override 
+    public boolean equals(Object o){
+        if(o!=null&&o instanceof User u){
+            return u.uuid.equals(uuid);
+        }
+        return false;
+    }
 }
