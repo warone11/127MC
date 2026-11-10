@@ -1,9 +1,14 @@
 package com.warone11.database.models;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class AccessToken {
+import com.warone11.database.DatabaseManager;
+
+public class AccessToken implements IDataBaseEntity {
     // ************* ATRIBUTES *************
     private UUID uuid;
     private String name;
@@ -39,6 +44,17 @@ public class AccessToken {
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
         this.active = active;
+    }
+    public AccessToken(ResultSet rs) throws SQLException{
+        this(
+            UUID.fromString(rs.getString("uuid")),
+            rs.getString("name"),
+            rs.getString("hash"),
+            UUID.fromString(rs.getString("user_uuid")),
+            rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"),DatabaseManager.SQLITE_DATETIME_FORMAT),
+            rs.getString("expires_at")==null?null:LocalDateTime.parse(rs.getString("expires_at"), DatabaseManager.SQLITE_DATETIME_FORMAT),
+            rs.getBoolean("active")
+        );
     }
     // ************* GETTERS AND SETTERS *************
 
@@ -104,6 +120,16 @@ public class AccessToken {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    @Override
+    public IDataBaseEntity create(ResultSet rs) throws SQLException {
+        return new AccessToken(rs);
+    }
+
+    @Override
+    public void getValues(PreparedStatement stmt) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 

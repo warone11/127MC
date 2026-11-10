@@ -1,5 +1,6 @@
 package com.warone11.database.models;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -10,11 +11,14 @@ import com.warone11.database.DatabaseManager;
  * Defines a user of the application
  * User
  */
-public class User {
+public class User implements IDataBaseEntity{
     private UUID uuid;
     private String username;
     private String passwordHash;
     private LocalDateTime createdAt;
+    public static final String[] COLUMN_ARRAY = {"uuid","username","password_hash","created_at"};
+    public static final String TABLE_NAME = "user";
+    public static final User PREFAB= new User(UUID.randomUUID(),"default","default",null);
     /**
      * Creates a new user
      * @param uuid uuid of the user
@@ -23,6 +27,7 @@ public class User {
      * @param created_at timestamp when the user was created
      * @throws IllegalArgumentException if uuid or username are null
      */
+    
     public User(UUID uuid, String username, String passwordHash, LocalDateTime createdAt) {
         if(uuid==null)
             throw new IllegalArgumentException("field uuid cannot be null");
@@ -85,5 +90,18 @@ public class User {
             return u.uuid.equals(uuid);
         }
         return false;
+    }
+
+    @Override
+    public IDataBaseEntity create(ResultSet rs) throws SQLException {
+        return new User(rs);
+    }
+
+    @Override
+    public void getValues(PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, uuid.toString());
+        stmt.setString(2, username);
+        stmt.setString(3, passwordHash);
+        stmt.setString(4, getCreatedAtAsSQL());
     }
 }
