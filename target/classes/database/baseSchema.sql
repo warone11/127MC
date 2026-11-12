@@ -19,7 +19,8 @@ create table if not exists "server"(
     uuid char(36) primary key not null,
     name varchar(50) not null unique,
     type varchar(20) not null,
-    created_at DATETIME not null DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME not null DEFAULT CURRENT_TIMESTAMP,
+    locked int not null check (locked in(0,1)) default 0,
 );
 create table if not exists "role"(
     uuid char(36) primary key not null,
