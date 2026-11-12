@@ -67,6 +67,6 @@ create table if not exists "server_action"(
 insert into "server"(uuid, name, type) values ("00000000-0000-0000-0000-000000000000", "global", "vanilla") ON CONFLICT(uuid) DO NOTHING;
 insert into "role"(uuid, name, system_role,is_administrator) values ("00000000-0000-0000-0000-000000000000", "admin", 1,1) ON CONFLICT(uuid) DO NOTHING;
 insert into "role"(uuid, name, system_role,can_see_console,can_use_console, can_see_history) values ("00000000-0000-0000-0000-000000000001", "moderator", 1,1,1,1) ON CONFLICT(uuid) DO NOTHING;
-insert into "role"(uuid, name, system_role, can_control_state,can_modify,can_access_files,can_see_console,can_use_console) values ("00000000-0000-0000-0000-000000000002", "co-admin", 1,1,1,1,1,1) ON CONFLICT(uuid) DO NOTHING;
+insert into "role"(uuid, name, system_role, can_control_state,can_modify,can_access_files,can_see_console,can_use_console, can_see_history) values ("00000000-0000-0000-0000-000000000002", "co-admin", 1,1,1,1,1,1,1) ON CONFLICT(uuid) DO NOTHING;
 insert into "role"(uuid, name, system_role,can_start) values ("00000000-0000-0000-0000-000000000003", "user", 1,1) ON CONFLICT(uuid) DO NOTHING;
 insert into "role"(uuid, name, system_role) values ("00000000-0000-0000-0000-000000000004", "viewer", 1) ON CONFLICT(uuid) DO NOTHING;
