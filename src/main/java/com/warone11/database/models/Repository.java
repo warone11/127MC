@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLModifier;
 import com.warone11.database.utils.SQLModifier.ModifierResult;
 
 public class Repository<T extends IDataBaseEntity> {
-    protected String[] columns;
-    protected String tableName;
+    protected final String[] columns;
+    protected final String tableName;
     protected Connection con;
     private final T prefabEntity;
     public Repository(T prefabEntity,Connection con, String tableName, String[] columns){
@@ -33,9 +34,10 @@ public class Repository<T extends IDataBaseEntity> {
         }
         query += ")";
         try (PreparedStatement stmt = con.prepareStatement(query)) {
-            prefabEntity.getValues(stmt);
+            values.getValues(stmt);
             return stmt.executeUpdate()==1;
         } catch (SQLException e) {
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
             return false;
         }
     }
@@ -47,6 +49,7 @@ public class Repository<T extends IDataBaseEntity> {
             }
             return stmt.executeQuery().next();
         }catch(SQLException e){
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
             return false;
         }
         
@@ -68,6 +71,7 @@ public class Repository<T extends IDataBaseEntity> {
                 return list;
             } 
         }catch(SQLException e){
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
             return null;
         }
     }
@@ -85,6 +89,7 @@ public class Repository<T extends IDataBaseEntity> {
             }
             return stmt.executeUpdate();
         }catch(SQLException e){
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
             return -1;
         }
     }
@@ -104,6 +109,7 @@ public class Repository<T extends IDataBaseEntity> {
             }
             return stmt.executeUpdate();
         }catch(SQLException e){
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
             return -1;
         }
     }

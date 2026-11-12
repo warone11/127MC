@@ -22,6 +22,7 @@ public class App {
                     </body>
                     </html>
                     """);
+                    
             });
 
             config.routes.get("/api/health", ctx -> {
@@ -29,7 +30,9 @@ public class App {
                     "application", "127MC",
                     "status", "ok"
                 ));
+                
             });
+            
 
         }).start(7070);
 

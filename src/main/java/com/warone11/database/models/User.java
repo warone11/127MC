@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.warone11.database.DatabaseManager;
+import com.warone11.database.utils.SQLUtils;
 /**
  * Defines a user of the application
- * User
  */
 public class User implements IDataBaseEntity{
     private UUID uuid;
@@ -33,13 +33,15 @@ public class User implements IDataBaseEntity{
             throw new IllegalArgumentException("field uuid cannot be null");
         if(username==null)
             throw new IllegalArgumentException("UUID = "+uuid+": Field username cannot be null");
+        if(createdAt==null)
+            createdAt=LocalDateTime.now();
         this.uuid = uuid;
         this.username = username;
         this.passwordHash = passwordHash;
         this.createdAt = createdAt;
     }
     public User(ResultSet rs) throws SQLException{
-        this(UUID.fromString(rs.getString("uuid")),rs.getString("username"),rs.getString("password_hash"),rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"), DatabaseManager.SQLITE_DATETIME_FORMAT));
+        this(UUID.fromString(rs.getString("uuid")),rs.getString("username"),rs.getString("password_hash"),SQLUtils.DateTimeSQLToJava(rs.getString("created_at")));
     }
 
     public UUID getUuid() {
@@ -66,14 +68,6 @@ public class User implements IDataBaseEntity{
 
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
-    }
-    public String getCreatedAtAsSQL(){
-        if(createdAt==null){
-            return null;
-        }
-        else{
-            return createdAt.format(DatabaseManager.SQLITE_DATETIME_FORMAT);
-        }
     }
 
     @Override
@@ -102,6 +96,6 @@ public class User implements IDataBaseEntity{
         stmt.setString(1, uuid.toString());
         stmt.setString(2, username);
         stmt.setString(3, passwordHash);
-        stmt.setString(4, getCreatedAtAsSQL());
+        stmt.setString(4, SQLUtils.DateTimeJavaToSQL(createdAt));
     }
 }

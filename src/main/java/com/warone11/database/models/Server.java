@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.warone11.database.DatabaseManager;
+import com.warone11.database.utils.SQLUtils;
 
 public class Server implements IDataBaseEntity{
 
@@ -44,7 +45,7 @@ public class Server implements IDataBaseEntity{
         this.uuid=UUID.fromString(rs.getString("uuid"));
         this.name=rs.getString("name");
         this.type=ServerType.valueOf(rs.getString("type"));
-        this.created_at=LocalDateTime.parse(rs.getString("created_at"),DatabaseManager.SQLITE_DATETIME_FORMAT);
+        this.created_at=SQLUtils.DateTimeSQLToJava(rs.getString("created_at"));
         this.locked=rs.getBoolean("locked");
     }
 
@@ -106,7 +107,7 @@ public class Server implements IDataBaseEntity{
         stmt.setString(1, uuid.toString());
         stmt.setString(2, name);
         stmt.setString(3, type.name());
-        stmt.setString(4, created_at.format(DatabaseManager.SQLITE_DATETIME_FORMAT));
+        stmt.setString(4, SQLUtils.DateTimeJavaToSQL(created_at));
         stmt.setBoolean(5, locked);
     }
     

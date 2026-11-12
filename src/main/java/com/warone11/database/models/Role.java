@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.warone11.database.DatabaseManager;
+import com.warone11.database.utils.SQLUtils;
 
 public class Role implements IDataBaseEntity{
 
@@ -47,7 +48,7 @@ public class Role implements IDataBaseEntity{
             UUID.fromString(rs.getString("uuid")),
             rs.getString("name"),
             rs.getBoolean("systemRole"),
-            rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"), DatabaseManager.SQLITE_DATETIME_FORMAT),
+            SQLUtils.DateTimeSQLToJava(rs.getString("created_at")),
             EnumSet.noneOf(Permission.class)
         );
         for(Permission p:Permission.values()){
@@ -113,7 +114,7 @@ public class Role implements IDataBaseEntity{
         stmt.setString(1, this.uuid.toString());
         stmt.setString(2, this.name);
         stmt.setBoolean(3, this.systemRole);
-        stmt.setString(4, this.createdAt.format(DatabaseManager.SQLITE_DATETIME_FORMAT));
+        stmt.setString(4, SQLUtils.DateTimeJavaToSQL(createdAt));
         int index =5;
         for(Permission p:Permission.values()){
             stmt.setBoolean(index, this.permissions.contains(p));

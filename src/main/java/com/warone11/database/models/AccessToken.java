@@ -7,13 +7,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.warone11.database.DatabaseManager;
+import com.warone11.database.utils.SQLUtils;
 
 public class AccessToken implements IDataBaseEntity {
     // ************* ATRIBUTES *************
     private UUID uuid;
     private String name;
     private String hash;
-    private UUID userUuid;
+    private UUID userUUID;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private boolean active;
@@ -24,23 +25,23 @@ public class AccessToken implements IDataBaseEntity {
      * @param uuid unique identifier of the token
      * @param name name of the token
      * @param hash hash of the token
-     * @param userUuid uuid of the user asigned to the token
+     * @param userUUID uuid of the user asigned to the token
      * @param createdAt time of creation of the token
      * @param expiresAt time of expiration of the token, if null the token will never expire
      * @param active if the token is active or not
      * 
      * @throws IllegalArgumentException if uuid, name, hash or userUuid is null
      */
-    public AccessToken(UUID uuid, String name, String hash, UUID userUuid, LocalDateTime createdAt, LocalDateTime expiresAt, boolean active) {
+    public AccessToken(UUID uuid, String name, String hash, UUID userUUID, LocalDateTime createdAt, LocalDateTime expiresAt, boolean active) {
         if(uuid==null) throw new IllegalArgumentException("uuid cannot be null");
         if(name==null) throw new IllegalArgumentException("name cannot be null");
         if(hash==null) throw new IllegalArgumentException("hash cannot be null");
-        if(userUuid==null) throw new IllegalArgumentException("userUuid cannot be null");
+        if(userUUID==null) throw new IllegalArgumentException("userUUID cannot be null");
         if(createdAt==null) createdAt= LocalDateTime.now();
         this.uuid = uuid;
         this.name = name;
         this.hash = hash;
-        this.userUuid = userUuid;
+        this.userUUID = userUUID;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
         this.active = active;
@@ -51,18 +52,18 @@ public class AccessToken implements IDataBaseEntity {
             rs.getString("name"),
             rs.getString("hash"),
             UUID.fromString(rs.getString("user_uuid")),
-            rs.getString("created_at")==null?null:LocalDateTime.parse(rs.getString("created_at"),DatabaseManager.SQLITE_DATETIME_FORMAT),
-            rs.getString("expires_at")==null?null:LocalDateTime.parse(rs.getString("expires_at"), DatabaseManager.SQLITE_DATETIME_FORMAT),
+            SQLUtils.DateTimeSQLToJava(rs.getString("created_at")),
+            SQLUtils.DateTimeSQLToJava(rs.getString("expires_at")),
             rs.getBoolean("active")
         );
     }
     // ************* GETTERS AND SETTERS *************
 
-    public UUID getUuid() {
+    public UUID getUUID() {
         return this.uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUUID(UUID uuid) {
         if(uuid==null) throw new IllegalArgumentException("uuid cannot be null");
         this.uuid = uuid;
     }
@@ -85,13 +86,13 @@ public class AccessToken implements IDataBaseEntity {
         this.hash = hash;
     }
 
-    public UUID getUserUuid() {
-        return this.userUuid;
+    public UUID getUserUUID() {
+        return this.userUUID;
     }
 
-    public void setUserUuid(UUID userUuid) {
-        if(userUuid==null) throw new IllegalArgumentException("userUuid cannot be null");
-        this.userUuid = userUuid;
+    public void setUserUUID(UUID userUUID) {
+        if(userUUID==null) throw new IllegalArgumentException("userUUID cannot be null");
+        this.userUUID = userUUID;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -13,7 +13,8 @@ public class DatabaseManager {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
     private static Connection con;
-    public static final DateTimeFormatter SQLITE_DATETIME_FORMAT =DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
+    public static final boolean SHOW_SQL_EXCEPTIONS=true;
 
     public static Connection getConnection(){
         if(con != null){
