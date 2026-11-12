@@ -3,11 +3,9 @@ package com.warone11.database.models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLUtils;
 
 public class SessionToken implements IDataBaseEntity{
@@ -123,5 +121,27 @@ public class SessionToken implements IDataBaseEntity{
         stmt.setString(6,SQLUtils.DateTimeJavaToSQL(expiresAt));
         stmt.setString(7,userUUID.toString());
     }
+
+    @Override
+    public String toString() {
+        return "---------------------\n"+
+                "uuid: "+uuid+"\n"+
+                "name: "+name+"\n"+
+                "hash: "+hash+"\n"+
+                "createdAt: "+createdAt+"\n"+
+                "lastUsed: "+lastUsed+"\n"+
+                "expiresAt: "+expiresAt+"\n"+
+                "userUUID: "+userUUID+"\n";
+    }
+    @Override 
+    public boolean equals(Object o){
+        if(o!=null&&o instanceof SessionToken st){
+            return st.getUuid().equals(uuid);
+        }
+        return false;
+    }
+    
+    
+    
     
 }

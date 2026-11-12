@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLUtils;
 /**
  * Defines a user of the application
@@ -81,7 +80,7 @@ public class User implements IDataBaseEntity{
     @Override 
     public boolean equals(Object o){
         if(o!=null&&o instanceof User u){
-            return u.uuid.equals(uuid);
+            return u.getUuid().equals(uuid);
         }
         return false;
     }

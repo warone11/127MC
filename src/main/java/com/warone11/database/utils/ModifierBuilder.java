@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.warone11.database.utils.SQLModifier.ModifierResult;
 import com.warone11.database.utils.SQLModifier.Operator;
-import com.warone11.database.utils.SQLModifiers.ComparingColumns;
 import com.warone11.database.utils.SQLModifiers.Order;
 import com.warone11.database.utils.SQLModifiers.Pager;
 
@@ -17,18 +16,22 @@ public class ModifierBuilder {
             throw new NullPointerException("modifiers is null");
         List<Object> params= new ArrayList<>();
         StringBuilder builder = new StringBuilder();
-        
+        boolean existsOperators=false;
         for (int i = 0; i < modifiers.length; i++) {
             if(modifiers[i] == null)
                 throw new NullPointerException("modifiers in position "+i+" is null");
             ModifierResult result= modifiers[i].toQuery();
-            
+            if(modifiers[i].canOperate()) 
+                existsOperators=true;
             if (i != 0&& modifiers[i].canOperate()) {
                 builder.append(" AND ");
             }
             builder.append(result.query);
             params.addAll(Arrays.asList(result.params));
             builder.append(" ");
+        }
+        if(existsOperators){
+            builder.insert(0, "WHERE");
         }
 
         return new ModifierResult(builder.toString(), params.toArray());
@@ -38,11 +41,13 @@ public class ModifierBuilder {
             throw new NullPointerException("modifiers is null");
         List<Object> params= new ArrayList<>();
         StringBuilder builder = new StringBuilder();
-        
+        boolean existsOperators=false;
         for (int i = 0; i < modifiers.length; i++) {
             if(modifiers[i] == null)
                 throw new NullPointerException("modifiers in position "+i+" is null");
             ModifierResult result= modifiers[i].toQuery();
+            if(modifiers[i].canOperate()) 
+                existsOperators=true;
             
             if (i != 0&& modifiers[i].canOperate()) {
                 builder.append(" OR ");
@@ -51,7 +56,9 @@ public class ModifierBuilder {
             params.addAll(Arrays.asList(result.params));
             builder.append(" ");
         }
-        
+        if(existsOperators){
+            builder.insert(0, "WHERE");
+        }
         return new ModifierResult(builder.toString(), params.toArray());
     }
     public static ModifierResult custom(Order order, Pager pager ,SQLModifier firstModifier,Operator... operators) {
@@ -63,6 +70,7 @@ public class ModifierBuilder {
             throw new IllegalArgumentException(firstModifier.getClass()+" cannot be used with operators");
         List<Object> params= new ArrayList<>();
         StringBuilder builder = new StringBuilder();
+        
         ModifierResult firstResult= firstModifier.toQuery();
         builder.append(firstResult.query);
         params.addAll(Arrays.asList(firstResult.params));

@@ -6,28 +6,27 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLUtils;
 
 public class Server implements IDataBaseEntity{
 
     
     public enum ServerType{
-        Vanilla,
-        Forge,
-        NeoForge,
-        Fabric,
-        Quilt,
-        Paper
+        vanilla,
+        forge,
+        neoForge,
+        fabric,
+        quilt,
+        paper
     }
     private UUID uuid;
     private String name;
     private ServerType type;
     private LocalDateTime created_at;
     private boolean locked;
-    public static final String[] COLUMNS={"uuid","name","type","created_at","locked"};
+    public static final String[] COLUMN_ARRAY={"uuid","name","type","created_at","locked"};
     public static final String TABLE_NAME="server";
-    public static final Server PREFAB= new Server(UUID.randomUUID(),"default",ServerType.Vanilla,null,false);
+    public static final Server PREFAB= new Server(UUID.randomUUID(),"default",ServerType.vanilla,null,false);
     
 
     public Server(UUID uuid, String name, ServerType type, LocalDateTime created_at, boolean locked) {
@@ -109,6 +108,23 @@ public class Server implements IDataBaseEntity{
         stmt.setString(3, type.name());
         stmt.setString(4, SQLUtils.DateTimeJavaToSQL(created_at));
         stmt.setBoolean(5, locked);
+    }
+
+    @Override
+    public String toString() {
+        return "-----------------------------\n"+
+        "UUID: " + uuid+"\n"+
+        "Name: " + name+"\n"+
+        "Type: " + type+"\n"+
+        "Created At: " + created_at+"\n"+
+        "Locked: " + locked+"\n";
+    }
+    @Override 
+    public boolean equals(Object o){
+        if(o!=null&&o instanceof Server s){
+            return s.getUuid().equals(uuid);
+        }
+        return false;
     }
     
     

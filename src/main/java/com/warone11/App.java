@@ -24,6 +24,7 @@ public class App {
                     """);
                     
             });
+            
 
             config.routes.get("/api/health", ctx -> {
                 ctx.json(java.util.Map.of(

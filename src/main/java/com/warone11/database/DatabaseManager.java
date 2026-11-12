@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.format.DateTimeFormatter;
 /** Manages the connection to the database
  */
 public class DatabaseManager {
@@ -15,6 +14,7 @@ public class DatabaseManager {
     private static Connection con;
     
     public static final boolean SHOW_SQL_EXCEPTIONS=true;
+    public static final boolean SHOW_SQL_QUERY=true; 
 
     public static Connection getConnection(){
         if(con != null){

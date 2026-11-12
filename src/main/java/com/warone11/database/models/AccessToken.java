@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLUtils;
 
 public class AccessToken implements IDataBaseEntity {
@@ -18,6 +17,11 @@ public class AccessToken implements IDataBaseEntity {
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private boolean active;
+    
+    // ************* CONSTANTS *************
+    public static final String TABLE_NAME="access_token";
+    public static final String[] COLUMN_ARRAY={"uuid","name","hash","user_uuid","created_at","expires_at","active"};
+    public static final AccessToken PREFAB=new AccessToken(UUID.randomUUID(),"default","default",UUID.randomUUID(),null,null,false);
 
     // ************* CONSTRUCTORS *************
     /**
@@ -59,11 +63,11 @@ public class AccessToken implements IDataBaseEntity {
     }
     // ************* GETTERS AND SETTERS *************
 
-    public UUID getUUID() {
+    public UUID getUuid() {
         return this.uuid;
     }
 
-    public void setUUID(UUID uuid) {
+    public void setUuid(UUID uuid) {
         if(uuid==null) throw new IllegalArgumentException("uuid cannot be null");
         this.uuid = uuid;
     }
@@ -132,6 +136,27 @@ public class AccessToken implements IDataBaseEntity {
     public void getValues(PreparedStatement stmt) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public String toString() {
+        return "-----------------------\n"+
+
+            "UUID: " + uuid + "\n" +
+            "Name: " + name + "\n" +
+            "Hash: " + hash + "\n" +
+            "User UUID: " + userUUID + "\n" +
+            "Created At: " + createdAt + "\n" +
+            "Expires At: " + expiresAt + "\n" +
+            "Active: " + active + "\n";
+    }
+    @Override 
+    public boolean equals(Object o){
+        if(o!=null&&o instanceof AccessToken at){
+            return at.getUuid().equals(uuid);
+        }
+        return false;
+    }
+    
 
 
 }

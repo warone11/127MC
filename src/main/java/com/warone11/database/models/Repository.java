@@ -33,6 +33,7 @@ public class Repository<T extends IDataBaseEntity> {
             query += "?";
         }
         query += ")";
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             values.getValues(stmt);
             return stmt.executeUpdate()==1;
@@ -42,7 +43,8 @@ public class Repository<T extends IDataBaseEntity> {
         }
     }
     public boolean exists(ModifierResult modifier){
-        String query = "SELECT * FROM "+tableName+" WHERE "+modifier.query;
+        String query = "SELECT * FROM "+tableName+" "+modifier.query;
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             for (int i = 0; i < modifier.params.length; i++) {
                 stmt.setObject(i+1, modifier.params[i]);
@@ -55,10 +57,14 @@ public class Repository<T extends IDataBaseEntity> {
         
     }
     public boolean exist(SQLModifier modifier){
-        return exists(modifier.toQuery());
+        ModifierResult result =modifier.toQuery();
+        if(modifier.canOperate())
+            result=new ModifierResult("WHERE "+result.query,result.params);
+        return exists(result);
     }
     public List<T> select(ModifierResult modifier){
-        String query = "SELECT * FROM "+tableName+" WHERE "+modifier.query;
+        String query = "SELECT * FROM "+tableName+" "+modifier.query;
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             for (int i = 0; i < modifier.params.length; i++) {
                 stmt.setObject(i+1, modifier.params[i]);
@@ -76,13 +82,17 @@ public class Repository<T extends IDataBaseEntity> {
         }
     }
     public List<T> select(SQLModifier modifier){
-        return select(modifier.toQuery());
+        ModifierResult result =modifier.toQuery();
+        if(modifier.canOperate())
+            result=new ModifierResult("WHERE "+result.query,result.params);
+        return select(result);
     }
     public List<T> selectAll(){
-        return select(new ModifierResult("1=1"));
+        return select(new ModifierResult("WHERE 1=1"));
     }
     public int delete(ModifierResult modifier){
-        String query = "DELETE FROM "+tableName+" WHERE "+modifier.query;
+        String query = "DELETE FROM "+tableName+" "+modifier.query;
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             for (int i = 0; i < modifier.params.length; i++) {
                 stmt.setObject(i+1, modifier.params[i]);
@@ -94,15 +104,22 @@ public class Repository<T extends IDataBaseEntity> {
         }
     }
     public int delete(SQLModifier modifier){
-        return delete(modifier.toQuery());
+        ModifierResult result =modifier.toQuery();
+        if(modifier.canOperate())
+            result=new ModifierResult("WHERE "+result.query,result.params);
+        return delete(result);
     }
     public int update(ModifierResult modifier, Map<String,Object> values){
+        
         String query = "UPDATE "+tableName+" SET ";
+        
         List<Entry<String,Object>> set =new ArrayList<>(values.entrySet());
         for(int i=0;i<set.size();i++){
             if(i!=0) query+=",";
             query+=set.get(i).getKey()+"=?";
         }
+        query+=" "+modifier.query;
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             for (int i = 0; i < modifier.params.length; i++) {
                 stmt.setObject(i+1,set.get(i).getValue());
@@ -114,6 +131,9 @@ public class Repository<T extends IDataBaseEntity> {
         }
     }
     public int update(SQLModifier modifier, Map<String,Object> values){
-        return update(modifier.toQuery(),values);
+        ModifierResult result =modifier.toQuery();
+        if(modifier.canOperate())
+            result=new ModifierResult("WHERE "+result.query,result.params);
+        return update(result,values);
     }
 }

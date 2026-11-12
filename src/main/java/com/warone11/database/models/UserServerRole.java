@@ -11,7 +11,7 @@ public class UserServerRole implements IDataBaseEntity {
     private UUID roleUUID;
 
     public static final String TABLE_NAME="user_server_role";
-    public static final String[] COLUMN_ARRAY={"user_uuid","server_uuid","action_uuid"};
+    public static final String[] COLUMN_ARRAY={"user_uuid","server_uuid","role_uuid"};
     public static final UserServerRole PREFAB=new UserServerRole(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
 
     public UserServerRole(UUID userUUID, UUID serverUUID, UUID roleUUID) {
@@ -66,5 +66,21 @@ public class UserServerRole implements IDataBaseEntity {
         stmt.setString(2, serverUUID.toString());
         stmt.setString(3, roleUUID.toString());
     }
+
+    @Override
+    public String toString() {
+        return "-------------------\n"+
+                "userUUID: "+userUUID+"\n"+
+                "serverUUID: "+serverUUID+"\n"+
+                "roleUUID: "+roleUUID+"\n";
+    }
+    @Override 
+    public boolean equals(Object o){
+        if(o!=null&&o instanceof UserServerRole usr){
+            return usr.getUserUUID().equals(userUUID)&&usr.getServerUUID().equals(serverUUID);
+        }
+        return false;
+    }
+    
     
 }

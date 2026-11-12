@@ -8,7 +8,6 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
-import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLUtils;
 
 public class Role implements IDataBaseEntity{
@@ -29,13 +28,15 @@ public class Role implements IDataBaseEntity{
     private boolean systemRole;
     private LocalDateTime createdAt;
     private EnumSet<Permission> permissions;
-    public static final String[] COLUMN_ARRAY = {"uuid","name","systemRole","created_at","can_start","can_control_state","can_modify","can_access_files","can_see_console","can_use_console","can_see_history","is_administrator"};
+    
+    public static final String[] COLUMN_ARRAY = {"uuid","name","system_role","created_at","can_start","can_control_state","can_modify","can_access_files","can_see_console","can_use_console","can_see_history","is_administrator"};
     public static final String TABLE_NAME = "role";
     public static final Role PREFAB= new Role(UUID.randomUUID(),"default",false,null,EnumSet.noneOf(Permission.class));
+
     public Role(UUID uuid, String name, boolean systemRole, LocalDateTime createdAt, Set<Permission> permissions) {
         if(uuid==null) throw new IllegalArgumentException("field uuid cannot be null");
         if(name==null) throw new IllegalArgumentException("UUID = "+uuid+": Field name cannot be null");
-        if(permissions==null) throw new IllegalArgumentException("UUID = "+uuid+": Field permissions cannot be null");
+        if(permissions==null) permissions=EnumSet.noneOf(Permission.class);
         if(createdAt==null) createdAt=LocalDateTime.now();
         this.uuid = uuid;
         this.name = name;
@@ -47,7 +48,7 @@ public class Role implements IDataBaseEntity{
         this(
             UUID.fromString(rs.getString("uuid")),
             rs.getString("name"),
-            rs.getBoolean("systemRole"),
+            rs.getBoolean("system_role"),
             SQLUtils.DateTimeSQLToJava(rs.getString("created_at")),
             EnumSet.noneOf(Permission.class)
         );
@@ -121,5 +122,27 @@ public class Role implements IDataBaseEntity{
             index++;
         }
 
+    }
+    @Override
+    public String toString() {
+        String string= "----------------------\n"+
+        "uuid: "+ uuid +"\n" +
+        "name: " + name + "\n" +
+        "systemRole: " + systemRole + "\n" +
+        "createdAt: " + createdAt + "\nPermission Summary:\n\n";
+
+        for(Permission p:Permission.values()){
+            string+="\n"+(permissions.contains(p)?"yes":"no")+"\t"+p.name();
+            
+        }
+        string+="\n";
+        return string;
+    }
+    @Override 
+    public boolean equals(Object o){
+        if(o!=null&&o instanceof Role rl){
+            return rl.getUuid().equals(uuid);
+        }
+        return false;
     }
 }
