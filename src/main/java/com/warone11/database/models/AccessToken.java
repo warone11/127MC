@@ -136,6 +136,9 @@ public class AccessToken implements IDataBaseEntity {
     public void getValues(PreparedStatement stmt) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    public boolean checkExpiration(){
+        return expiresAt!=null&&expiresAt.isAfter(LocalDateTime.now());
+    }
 
     @Override
     public String toString() {

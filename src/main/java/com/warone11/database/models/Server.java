@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.warone11.database.utils.SQLConstants;
 import com.warone11.database.utils.SQLUtils;
 
 public class Server implements IDataBaseEntity{
@@ -34,6 +35,7 @@ public class Server implements IDataBaseEntity{
         if(name==null) throw new IllegalArgumentException("field name cannot be null");
         if(type==null) throw new IllegalArgumentException("field type cannot be null");
         if(created_at==null) created_at=LocalDateTime.now();
+        if(uuid.equals(UUID.fromString(SQLConstants.GLOBAL_SERVER_UUID))) throw new IllegalArgumentException("Tried instancing system server");
         this.uuid = uuid;
         this.name = name;
         this.type = type;
@@ -98,6 +100,7 @@ public class Server implements IDataBaseEntity{
 
     @Override
     public IDataBaseEntity create(ResultSet rs) throws SQLException {
+        if(rs.getString("uuid").equals(SQLConstants.GLOBAL_SERVER_UUID)) return null;
         return new Server(rs);
     }
 

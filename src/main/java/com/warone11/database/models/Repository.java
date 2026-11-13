@@ -43,7 +43,7 @@ public class Repository<T extends IDataBaseEntity> {
         }
     }
     public boolean exists(ModifierResult modifier){
-        String query = "SELECT * FROM "+tableName+" "+modifier.query;
+        String query = "SELECT 1 FROM "+tableName+" "+modifier.query;
         if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             for (int i = 0; i < modifier.params.length; i++) {
@@ -72,7 +72,9 @@ public class Repository<T extends IDataBaseEntity> {
             try (ResultSet rs = stmt.executeQuery()) {
                 List<T> list = new ArrayList<>();
                 while(rs.next()){
-                    list.add((T)prefabEntity.create(rs));
+                    T createdEntity=(T)prefabEntity.create(rs);
+                    if(createdEntity!=null)
+                    list.add(createdEntity);
                 }
                 return list;
             } 
@@ -121,8 +123,13 @@ public class Repository<T extends IDataBaseEntity> {
         query+=" "+modifier.query;
         if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
-            for (int i = 0; i < modifier.params.length; i++) {
-                stmt.setObject(i+1,set.get(i).getValue());
+            int index = 1;
+            for (Entry<String, Object> entry : set) {
+                stmt.setObject(index++, entry.getValue());
+            }
+
+            for (Object param : modifier.params) {
+                stmt.setObject(index++, param);
             }
             return stmt.executeUpdate();
         }catch(SQLException e){

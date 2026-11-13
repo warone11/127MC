@@ -52,6 +52,7 @@ create table if not exists "session_token"(
     created_at DATETIME not null DEFAULT CURRENT_TIMESTAMP,
     last_used DATETIME not null,
     expires_at DATETIME,
+    active int not null check (active in(0,1)) default 1,
     user_uuid char(36) not null,
     foreign key (user_uuid) references user(uuid)
 );
@@ -71,3 +72,9 @@ insert into "role"(uuid, name, system_role,can_see_console,can_use_console, can_
 insert into "role"(uuid, name, system_role, can_control_state,can_modify,can_access_files,can_see_console,can_use_console, can_see_history) values ("00000000-0000-0000-0000-000000000002", "co-admin", 1,1,1,1,1,1,1) ON CONFLICT(uuid) DO NOTHING;
 insert into "role"(uuid, name, system_role,can_start) values ("00000000-0000-0000-0000-000000000003", "user", 1,1) ON CONFLICT(uuid) DO NOTHING;
 insert into "role"(uuid, name, system_role) values ("00000000-0000-0000-0000-000000000004", "viewer", 1) ON CONFLICT(uuid) DO NOTHING;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_session_token_hash
+ON session_token(hash);
+
+CREATE INDEX IF NOT EXISTS idx_session_token_user
+ON session_token(user_uuid);

@@ -15,13 +15,14 @@ public class SessionToken implements IDataBaseEntity{
     private LocalDateTime createdAt;
     private LocalDateTime lastUsed;
     private LocalDateTime expiresAt;
+    private boolean active;
     private UUID userUUID;
 
     public static final String TABLE_NAME="session_token";
-    public static final String[] COLUMN_ARRAY={"uuid","name","hash","created_at","last_used","expires_at","user_uuid"};
-    public static final SessionToken PREFAB=new SessionToken(UUID.randomUUID(),"default","default",null,null,null,UUID.randomUUID());
+    public static final String[] COLUMN_ARRAY={"uuid","name","hash","created_at","last_used","expires_at","active","user_uuid"};
+    public static final SessionToken PREFAB=new SessionToken(UUID.randomUUID(),"default","default",null,null,null,false,UUID.randomUUID());
 
-    public SessionToken(UUID uuid, String name, String hash, LocalDateTime createdAt, LocalDateTime lastUsed, LocalDateTime expiresAt, UUID userUUID) {
+    public SessionToken(UUID uuid, String name, String hash, LocalDateTime createdAt, LocalDateTime lastUsed, LocalDateTime expiresAt,boolean active, UUID userUUID) {
         if(uuid==null) throw new IllegalArgumentException("field uuid cannot be null");
         if(name==null) throw new IllegalArgumentException("field name cannot be null");
         if(hash==null) throw new IllegalArgumentException("field hash cannot be null");
@@ -43,6 +44,7 @@ public class SessionToken implements IDataBaseEntity{
         createdAt=SQLUtils.DateTimeSQLToJava(rs.getString("created_at"));
         lastUsed=SQLUtils.DateTimeSQLToJava(rs.getString("last_used"));
         expiresAt=SQLUtils.DateTimeSQLToJava(rs.getString("expires_at"));
+        active=rs.getBoolean("active");
         userUUID=UUID.fromString(rs.getString("user_uuid"));
     }
 
@@ -109,6 +111,12 @@ public class SessionToken implements IDataBaseEntity{
     public IDataBaseEntity create(ResultSet rs) throws SQLException {
         return new SessionToken(rs);
     }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    public boolean isActive() {
+        return active;
+    }
     
 
     @Override
@@ -119,7 +127,8 @@ public class SessionToken implements IDataBaseEntity{
         stmt.setString(4,SQLUtils.DateTimeJavaToSQL(createdAt));
         stmt.setString(5,SQLUtils.DateTimeJavaToSQL(lastUsed));
         stmt.setString(6,SQLUtils.DateTimeJavaToSQL(expiresAt));
-        stmt.setString(7,userUUID.toString());
+        stmt.setBoolean(7,active);
+        stmt.setString(8,userUUID.toString());
     }
 
     @Override
@@ -131,6 +140,7 @@ public class SessionToken implements IDataBaseEntity{
                 "createdAt: "+createdAt+"\n"+
                 "lastUsed: "+lastUsed+"\n"+
                 "expiresAt: "+expiresAt+"\n"+
+                "active: "+(active?"yes":"no")+"\n"+
                 "userUUID: "+userUUID+"\n";
     }
     @Override 
