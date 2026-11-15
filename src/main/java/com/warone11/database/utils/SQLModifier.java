@@ -1,8 +1,5 @@
 package com.warone11.database.utils;
 
-import com.warone11.database.utils.SQLModifiers.Order;
-import com.warone11.database.utils.SQLModifiers.Pager;
-
 public abstract class SQLModifier {
     public abstract ModifierResult toQuery();
     public abstract boolean canOperate();

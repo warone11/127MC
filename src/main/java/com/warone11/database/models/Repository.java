@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import com.warone11.database.DatabaseManager;
 import com.warone11.database.utils.SQLModifier;
@@ -88,6 +89,32 @@ public class Repository<T extends IDataBaseEntity> {
         if(modifier.canOperate())
             result=new ModifierResult("WHERE "+result.query,result.params);
         return select(result);
+    }
+    public Optional<T> selectFirst(ModifierResult modifier){
+        String query = "SELECT 1 FROM "+tableName+" "+modifier.query;
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            for (int i = 0; i < modifier.params.length; i++) {
+                stmt.setObject(i+1, modifier.params[i]);
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()){
+                    T createdEntity=(T)prefabEntity.create(rs);
+                    if(createdEntity!=null)
+                    return Optional.of(createdEntity);
+                }
+                return Optional.empty();
+            } 
+        }catch(SQLException e){
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
+            return null;
+        }
+    }
+    public Optional<T> selectFirst(SQLModifier modifier){
+        ModifierResult result =modifier.toQuery();
+        if(modifier.canOperate())
+            result=new ModifierResult("WHERE "+result.query,result.params);
+        return selectFirst(result);
     }
     public List<T> selectAll(){
         return select(new ModifierResult("WHERE 1=1"));
