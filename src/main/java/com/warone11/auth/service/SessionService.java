@@ -1,9 +1,10 @@
 package com.warone11.auth.service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.warone11.auth.exceptions.InternalLoginException;
+import com.warone11.auth.exceptions.InternalDataBaseException;
 import com.warone11.auth.exceptions.InvalidCredentialsException;
 import com.warone11.auth.exceptions.InvalidTokenException;
 import com.warone11.auth.exceptions.RevokedTokenException;
@@ -14,6 +15,7 @@ import com.warone11.database.RepositoryProvider;
 import com.warone11.database.models.AccessToken;
 import com.warone11.database.models.SessionToken;
 import com.warone11.database.models.User;
+import com.warone11.database.utils.ModifierBuilder;
 import com.warone11.database.utils.SQLModifiers.ComparingColumns;
 
 public class SessionService {
@@ -27,7 +29,7 @@ public class SessionService {
      * @return the session token <br>
      * @throws InvalidTokenException if the token is invalid
      * @throws RevokedTokenException if the token is revoked
-     * @throws InternalLoginException if an internal error occurs in the database
+     * @throws InternalDataBaseException if an internal error occurs in the database
      */
     
     public String login(String token) throws InvalidTokenException, RevokedTokenException{
@@ -39,13 +41,13 @@ public class SessionService {
         //get the acess token from the database where the hash is equal to the hash of the token
         Optional<AccessToken> result = accTokenRepo.selectFirst(ComparingColumns.of("hash", ComparingColumns.Comparator.EQUALS, hash));
         //failed to get the value from the database
-        if(result==null)        throw new InternalLoginException();
+        if(result==null)        throw new InternalDataBaseException();
         //no value was found in the database
         if(result.isEmpty())    throw new InvalidTokenException();
         //get the acess token (the value was found)
         AccessToken accToken=result.get();
 
-        if(!accToken.isActive()||accToken.checkExpiration()) throw new RevokedTokenException();
+        if((!accToken.isActive())||accToken.checkExpiration()) throw new RevokedTokenException();
         //create a session and return its insecure token value
         return createSession(accToken.getUserUUID(), "test");
     }
@@ -70,7 +72,7 @@ public class SessionService {
         }
         else{
             //otherwise throw an exception due to an error with the database 
-            throw new InternalLoginException();
+            throw new InternalDataBaseException();
         }
         
     }
@@ -82,7 +84,7 @@ public class SessionService {
      * @param password password of the user
      * @return the session token <br>
      * @throws InvalidCredentialsException if the credentials are invalid
-     * @throws InternalLoginException if an internal error occurs in the database
+     * @throws InternalDataBaseException if an internal error occurs in the database
      */
     public String login(String username, String password) throws InvalidCredentialsException{
         if(username==null || username.isEmpty()) throw new IllegalArgumentException("invalid username");
@@ -91,7 +93,7 @@ public class SessionService {
         // gets the user where the username column is equal to the username
         Optional<User> result = userRepo.selectFirst(ComparingColumns.of("username", ComparingColumns.Comparator.EQUALS, username));
         // internal error in the database
-        if(result==null)        throw new InternalLoginException();
+        if(result==null)        throw new InternalDataBaseException();
         // no user was found
         if(result.isEmpty()){
             passwordHasher.verify(password, fakeHash);
@@ -116,6 +118,42 @@ public class SessionService {
         }
 
 
+    }
+    /**
+     * Revokes a specific session
+     * @param sessionUUID UUID of the session to revoke
+     * @return if the revoke has been completed successfully
+     * @throws InternalDataBaseException if there was an error in the database
+     */
+    public boolean RevokeSession(UUID sessionUUID){
+        if(sessionUUID==null) throw new IllegalArgumentException("sessionUUID cannot be null");
+        var sessionRepo = RepositoryProvider.sessionTokenRepository;
+        int result = sessionRepo.update(ComparingColumns.of("uuid", ComparingColumns.Comparator.EQUALS, sessionUUID.toString()),Map.of("active", false));
+        if(result<0) throw new InternalDataBaseException();
+        return result!=0;
+    }
+    /**
+     * Revokes all sessions from a specific user
+     * @param userUUID UUID of the user to revoke from
+     * @return amount of sessions revoked
+     * @throws InternalDataBaseException if there was an error in the database
+     */
+    public int RevokeAllSesions(UUID userUUID){
+        if(userUUID==null) throw new IllegalArgumentException("userUUID cannot be null");
+        var sessionRepo = RepositoryProvider.sessionTokenRepository;
+        int result = sessionRepo.update(ComparingColumns.of("user_uuid", ComparingColumns.Comparator.EQUALS, userUUID.toString()),
+            Map.of("active", false));
+        if(result<0) throw new  InternalDataBaseException();
+        return result;
+    }
+    public UUID VerifySession(String sessionToken) throws InvalidTokenException{
+        if(sessionToken==null||sessionToken.isBlank()) throw new IllegalArgumentException("invalid token");
+        String tokenHash=TokenHasher.hash(sessionToken);
+        var sessionRepo=RepositoryProvider.sessionTokenRepository;
+        Optional<SessionToken> result=sessionRepo.selectFirst(ComparingColumns.of("hash",ComparingColumns.Comparator.EQUALS,tokenHash));
+        if(result==null)        throw new InternalDataBaseException();
+        if(result.isEmpty())    throw new InvalidTokenException();
+        return result.get().getUserUUID();
     }
     
 }

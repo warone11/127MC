@@ -36,6 +36,7 @@ public class SessionToken implements IDataBaseEntity{
         this.lastUsed = lastUsed;
         this.expiresAt = expiresAt;
         this.userUUID=userUUID;
+        this.active=active;
     }
     public SessionToken(ResultSet rs) throws SQLException{
         uuid=UUID.fromString(rs.getString("uuid"));

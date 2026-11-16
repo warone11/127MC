@@ -104,6 +104,7 @@ public class AccessToken implements IDataBaseEntity {
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
+        if(createdAt==null) createdAt=LocalDateTime.now();
         this.createdAt = createdAt;
     }
 
@@ -134,7 +135,13 @@ public class AccessToken implements IDataBaseEntity {
 
     @Override
     public void getValues(PreparedStatement stmt) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        stmt.setString(1, uuid.toString());
+        stmt.setString(2, name);
+        stmt.setString(3, hash);
+        stmt.setString(4,userUUID.toString());
+        stmt.setString(5, SQLUtils.DateTimeJavaToSQL(createdAt));
+        stmt.setString(6, SQLUtils.DateTimeJavaToSQL(expiresAt));
+        stmt.setBoolean(7, active);
     }
     public boolean checkExpiration(){
         return expiresAt!=null&&expiresAt.isAfter(LocalDateTime.now());

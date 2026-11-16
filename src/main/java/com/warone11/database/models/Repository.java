@@ -91,7 +91,7 @@ public class Repository<T extends IDataBaseEntity> {
         return select(result);
     }
     public Optional<T> selectFirst(ModifierResult modifier){
-        String query = "SELECT 1 FROM "+tableName+" "+modifier.query;
+        String query = "SELECT * FROM "+tableName+" "+modifier.query+" limit 1";
         if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             for (int i = 0; i < modifier.params.length; i++) {
