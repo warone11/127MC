@@ -170,8 +170,27 @@ public class Repository<T extends IDataBaseEntity> {
             result=new ModifierResult("WHERE "+result.query,result.params);
         return update(result,values);
     }
-    /* public boolean update(T entity){
+    public boolean update(T entity){
         if(entity==null) throw new IllegalArgumentException("entity cannot be null");
         String query= "UPDATE "+tableName+" SET ";
-    } */
+        var map = entity.toMap();
+        List<Entry<String,Object>> set =new ArrayList<>(map.entrySet());
+        for(int i=0;i<set.size();i++){
+            if(i!=0) query+=",";
+            query+=set.get(i).getKey()+"=?";
+        }
+        query+=" WHERE "+entity.SQLEqualsQuery();
+        if(DatabaseManager.SHOW_SQL_QUERY) System.out.println(query);
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            int index = 1;
+            for (Entry<String, Object> entry : set) {
+                stmt.setObject(index++, entry.getValue());
+            }
+            int result = stmt.executeUpdate();
+            return result>0;
+        }catch(SQLException e){
+            if(DatabaseManager.SHOW_SQL_EXCEPTIONS) e.printStackTrace();
+            return false;
+        }
+    } 
 }
