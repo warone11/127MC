@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -123,6 +125,20 @@ public class Role implements IDataBaseEntity{
         }
 
     }
+
+    @Override
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("uuid", uuid.toString());
+        map.put("name", name);
+        map.put("system_role", systemRole);
+        map.put("created_at", SQLUtils.DateTimeJavaToSQL(createdAt));
+        for (Permission permission : Permission.values()) {
+            map.put(permission.name(), permissions.contains(permission));
+        }
+        return map;
+    }
+
     @Override
     public String toString() {
         String string= "----------------------\n"+
@@ -144,5 +160,9 @@ public class Role implements IDataBaseEntity{
             return rl.getUuid().equals(uuid);
         }
         return false;
+    }
+    @Override
+    public String SQLEqualsQuery() {
+        return " uuid="+this.uuid;
     }
 }

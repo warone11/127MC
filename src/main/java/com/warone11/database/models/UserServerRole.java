@@ -3,6 +3,8 @@ package com.warone11.database.models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 public class UserServerRole implements IDataBaseEntity {
@@ -68,6 +70,15 @@ public class UserServerRole implements IDataBaseEntity {
     }
 
     @Override
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("user_uuid", userUUID.toString());
+        map.put("server_uuid", serverUUID.toString());
+        map.put("role_uuid", roleUUID.toString());
+        return map;
+    }
+
+    @Override
     public String toString() {
         return "-------------------\n"+
                 "userUUID: "+userUUID+"\n"+
@@ -80,6 +91,10 @@ public class UserServerRole implements IDataBaseEntity {
             return usr.getUserUUID().equals(userUUID)&&usr.getServerUUID().equals(serverUUID);
         }
         return false;
+    }
+    @Override
+    public String SQLEqualsQuery() {
+        return " server_uuid="+this.serverUUID+" AND user_uuid="+this.userUUID;
     }
     
     

@@ -170,4 +170,8 @@ public class Repository<T extends IDataBaseEntity> {
             result=new ModifierResult("WHERE "+result.query,result.params);
         return update(result,values);
     }
+    /* public boolean update(T entity){
+        if(entity==null) throw new IllegalArgumentException("entity cannot be null");
+        String query= "UPDATE "+tableName+" SET ";
+    } */
 }

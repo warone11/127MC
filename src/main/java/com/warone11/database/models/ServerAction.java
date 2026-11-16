@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import com.warone11.database.utils.SQLUtils;
@@ -121,6 +123,18 @@ public class ServerAction implements IDataBaseEntity {
     }
 
     @Override
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("uuid", uuid.toString());
+        map.put("name", name);
+        map.put("action_time", SQLUtils.DateTimeJavaToSQL(actionTime));
+        map.put("user_uuid", userUUID.toString());
+        map.put("server_uuid", serverUUID.toString());
+        map.put("action_type", actionType.name());
+        return map;
+    }
+
+    @Override
     public String toString() {
         return "-----------------------\n"+
                 "uuid: "+uuid+"\n"+
@@ -139,7 +153,10 @@ public class ServerAction implements IDataBaseEntity {
         }
         return false;
     }
-    
+    @Override
+    public String SQLEqualsQuery() {
+        return " uuid="+this.uuid;
+    }
     
     
 }

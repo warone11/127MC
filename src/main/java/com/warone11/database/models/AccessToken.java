@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import com.warone11.database.utils.SQLUtils;
@@ -143,6 +145,20 @@ public class AccessToken implements IDataBaseEntity {
         stmt.setString(6, SQLUtils.DateTimeJavaToSQL(expiresAt));
         stmt.setBoolean(7, active);
     }
+
+    @Override
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("uuid", uuid.toString());
+        map.put("name", name);
+        map.put("hash", hash);
+        map.put("user_uuid", userUUID.toString());
+        map.put("created_at", SQLUtils.DateTimeJavaToSQL(createdAt));
+        map.put("expires_at", SQLUtils.DateTimeJavaToSQL(expiresAt));
+        map.put("active", active);
+        return map;
+    }
+
     public boolean checkExpiration(){
         return expiresAt!=null&&expiresAt.isAfter(LocalDateTime.now());
     }
@@ -165,6 +181,10 @@ public class AccessToken implements IDataBaseEntity {
             return at.getUuid().equals(uuid);
         }
         return false;
+    }
+    @Override
+    public String SQLEqualsQuery() {
+        return " uuid="+this.uuid;
     }
     
 

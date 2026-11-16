@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import com.warone11.database.utils.SQLUtils;
@@ -136,6 +138,20 @@ public class SessionToken implements IDataBaseEntity{
     }
 
     @Override
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("uuid", uuid.toString());
+        map.put("name", name);
+        map.put("hash", hash);
+        map.put("created_at", SQLUtils.DateTimeJavaToSQL(createdAt));
+        map.put("last_used", SQLUtils.DateTimeJavaToSQL(lastUsed));
+        map.put("expires_at", SQLUtils.DateTimeJavaToSQL(expiresAt));
+        map.put("active", active);
+        map.put("user_uuid", userUUID.toString());
+        return map;
+    }
+
+    @Override
     public String toString() {
         return "---------------------\n"+
                 "uuid: "+uuid+"\n"+
@@ -154,7 +170,10 @@ public class SessionToken implements IDataBaseEntity{
         }
         return false;
     }
-    
+    @Override
+    public String SQLEqualsQuery() {
+        return " uuid="+this.uuid;
+    }
     
     
     
