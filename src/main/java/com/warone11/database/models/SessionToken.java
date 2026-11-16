@@ -118,6 +118,9 @@ public class SessionToken implements IDataBaseEntity{
     public boolean isActive() {
         return active;
     }
+    public boolean checkExpiration(){
+        return this.expiresAt!=null&&expiresAt.isAfter(LocalDateTime.now());
+    }
     
 
     @Override

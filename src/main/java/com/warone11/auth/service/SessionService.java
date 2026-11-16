@@ -146,14 +146,26 @@ public class SessionService {
         if(result<0) throw new  InternalDataBaseException();
         return result;
     }
-    public UUID VerifySession(String sessionToken) throws InvalidTokenException{
+    /**
+     * Verifies session token and returns the  User associated
+     * @param sessionToken the token to check
+     * @return the UUID of the user
+     * @throws InvalidTokenException if the token is not valid
+     * @throws RevokedTokenException if the token is revoked or expired
+     * @throws InternalDataBaseException if there was a problem in the database
+     */
+    public User VerifySession(String sessionToken) throws InvalidTokenException, RevokedTokenException{
         if(sessionToken==null||sessionToken.isBlank()) throw new IllegalArgumentException("invalid token");
         String tokenHash=TokenHasher.hash(sessionToken);
         var sessionRepo=RepositoryProvider.sessionTokenRepository;
+        
         Optional<SessionToken> result=sessionRepo.selectFirst(ComparingColumns.of("hash",ComparingColumns.Comparator.EQUALS,tokenHash));
         if(result==null)        throw new InternalDataBaseException();
         if(result.isEmpty())    throw new InvalidTokenException();
-        return result.get().getUserUUID();
+        var sessionTokenDO = result.get();
+        if((!sessionTokenDO.isActive())||sessionTokenDO.checkExpiration()) throw new RevokedTokenException();
+        var userRepo= RepositoryProvider.userRepository;
+        return userRepo.selectFirst(ComparingColumns.of("uuid", ComparingColumns.Comparator.EQUALS, sessionTokenDO.getUserUUID().toString())).orElseThrow(InternalDataBaseException::new);
     }
     
 }
